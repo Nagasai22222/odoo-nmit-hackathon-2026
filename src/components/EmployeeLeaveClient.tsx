@@ -44,15 +44,15 @@ export default function EmployeeLeaveClient({ initialLeaves }: EmployeeLeaveClie
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <h1 style={{ fontSize: "1.6rem", marginBottom: "0.25rem" }}>
-              My Leave Requests & Balance 🌴
+              My Time Off & Leave Requests 🌴
             </h1>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-              Request time off, track approval progress, and review leave history.
+              Submit time off applications, track approval progress, and review leave history.
             </p>
           </div>
 
           <button onClick={() => setIsModalOpen(true)} className="btn-primary" style={{ width: "auto" }}>
-            ➕ Request New Leave
+            ➕ Apply for Leave
           </button>
         </div>
       </div>
@@ -88,8 +88,8 @@ export default function EmployeeLeaveClient({ initialLeaves }: EmployeeLeaveClie
           <tbody>
             {leaves.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ padding: "2rem", textAlign: "center", color: "var(--text-muted)" }}>
-                  No leave requests submitted yet. Click &quot;Request New Leave&quot; above to submit your first application.
+                <td colSpan={5} style={{ padding: "2.5rem", textAlign: "center", color: "var(--text-muted)" }}>
+                  No leave requests submitted yet. Click &quot;Apply for Leave&quot; above to submit your first request.
                 </td>
               </tr>
             ) : (

@@ -19,8 +19,24 @@ export default function LeaveFormModal({ onClose, onSubmitted }: LeaveFormModalP
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    if (!startDate || !endDate) {
+      setError("Please select both start date and end date.");
+      return;
+    }
+
+    if (new Date(endDate) < new Date(startDate)) {
+      setError("End date cannot be before start date.");
+      return;
+    }
+
+    if (!reason.trim()) {
+      setError("Please provide a reason for your leave request.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/leaves", {
@@ -139,17 +155,18 @@ export default function LeaveFormModal({ onClose, onSubmitted }: LeaveFormModalP
               rows={3}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Provide context or explanation for HR approval..."
+              placeholder="Provide context or explanation for HR review..."
+              maxLength={500}
               required
             />
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem", marginTop: "1.5rem" }}>
-            <button type="button" onClick={onClose} className="btn-secondary">
+            <button type="button" onClick={onClose} className="btn-secondary" disabled={loading}>
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Submitting..." : "Submit Request"}
+              {loading ? "Submitting Request..." : "Submit Request"}
             </button>
           </div>
         </form>
