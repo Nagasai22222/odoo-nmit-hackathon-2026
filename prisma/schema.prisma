@@ -1,0 +1,82 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String         @id @default(uuid())
+  employeeId        String         @unique
+  email             String         @unique
+  passwordHash      String
+  role              String         @default("EMPLOYEE") // "EMPLOYEE" | "HR_ADMIN"
+  isVerified        Boolean        @default(false)
+  verificationToken String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  profile       Profile?
+  attendances   Attendance[]
+  leaveRequests LeaveRequest[]
+  payroll       Payroll?
+}
+
+model Profile {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName     String
+  lastName      String
+  phone         String?
+  address       String?
+  designation   String?
+  department    String?
+  dateOfJoining DateTime?
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Attendance {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime
+  checkIn    DateTime?
+  checkOut   DateTime?
+  status     String    @default("PRESENT") // "PRESENT" | "ABSENT" | "HALF_DAY" | "LEAVE"
+  totalHours Float?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model LeaveRequest {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leaveType    String   // "PAID" | "SICK" | "UNPAID"
+  startDate    DateTime
+  endDate      DateTime
+  reason       String
+  status       String   @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  adminComment String?
+  reviewedBy   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Payroll {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  basicSalary Float
+  allowances  Float    @default(0)
+  deductions  Float    @default(0)
+  netSalary   Float
+  payPeriod   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
