@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          String    @default("EMPLOYEE")
+  
+  companyName   String?
+  name          String?
+  phone         String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  employee      Employee?
+}
+
+model Employee {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  employeeId     String    @unique // E.g., EMP-001
+  firstName      String
+  lastName       String
+  phone          String?
+  address        String?
+  profilePicture String?
+  
+  department     String?
+  designation    String?
+  joinDate       DateTime  @default(now())
+  
+  salary         Payroll?
+  attendances    Attendance[]
+  leaveRequests  LeaveRequest[]
+  documents      Document[]
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Attendance {
+  id          String           @id @default(cuid())
+  employeeId  String
+  employee    Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  date        DateTime         // The day of attendance
+  checkIn     DateTime?
+  checkOut    DateTime?
+  status      String           @default("ABSENT")
+  
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([employeeId, date]) // One attendance record per employee per day
+}
+
+model LeaveRequest {
+  id          String      @id @default(cuid())
+  employeeId  String
+  employee    Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  type        String
+  startDate   DateTime
+  endDate     DateTime
+  reason      String
+  status      String      @default("PENDING")
+  adminRemarks String?
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Payroll {
+  id          String   @id @default(cuid())
+  employeeId  String   @unique
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  baseSalary  Float
+  allowances  Float    @default(0)
+  deductions  Float    @default(0)
+  netSalary   Float
+  
+  updatedAt   DateTime @updatedAt
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  name        String
+  fileUrl     String
+  
+  createdAt   DateTime @default(now())
+}
