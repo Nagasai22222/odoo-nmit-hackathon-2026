@@ -1,107 +1,159 @@
-import React, { useState } from 'react';
-import { Clock, Calendar as CalendarIcon, MapPin } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
-import DataTable from '../../components/ui/DataTable';
-import StatusBadge from '../../components/ui/StatusBadge';
-import { useToast } from '../../context/ToastContext';
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 const EmployeeAttendance = () => {
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [isChecking, setIsChecking] = useState(false);
-  const { addToast } = useToast();
+  const [activeSection, setActiveSection] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(9); // October
+  const dropdownRef = useRef(null);
 
-  const handleCheckInOut = () => {
-    setIsChecking(true);
-    setTimeout(() => {
-      setIsCheckedIn(!isCheckedIn);
-      setIsChecking(false);
-      addToast(`Successfully checked ${isCheckedIn ? 'out' : 'in'}!`, 'success');
-    }, 1000);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handlePrevMonth = () => {
+    setCurrentMonthIndex((prev) => (prev > 0 ? prev - 1 : 11));
   };
 
-  const attendanceHistory = [
-    { id: 1, date: '2023-10-31', checkIn: '09:00 AM', checkOut: '05:30 PM', workingHours: '8h 30m', status: 'Present' },
-    { id: 2, date: '2023-10-30', checkIn: '08:55 AM', checkOut: '05:45 PM', workingHours: '8h 50m', status: 'Present' },
-    { id: 3, date: '2023-10-27', checkIn: '09:15 AM', checkOut: '05:30 PM', workingHours: '8h 15m', status: 'Present' },
-    { id: 4, date: '2023-10-26', checkIn: '09:00 AM', checkOut: '01:00 PM', workingHours: '4h 00m', status: 'Half-day' },
-    { id: 5, date: '2023-10-25', checkIn: '-', checkOut: '-', workingHours: '-', status: 'Absent' },
-  ];
+  const handleNextMonth = () => {
+    setCurrentMonthIndex((prev) => (prev < 11 ? prev + 1 : 0));
+  };
 
-  const columns = [
-    { 
-      header: 'Date', 
-      key: 'date',
-      render: (row) => new Date(row.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-    },
-    { header: 'Check In', key: 'checkIn' },
-    { header: 'Check Out', key: 'checkOut' },
-    { header: 'Working Hours', key: 'workingHours' },
-    { 
-      header: 'Status', 
-      key: 'status',
-      render: (row) => <StatusBadge status={row.status} />
-    }
+  const attendanceData = [
+    { id: 1, date: `28/${(currentMonthIndex + 1).toString().padStart(2, '0')}/2025`, checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
+    { id: 2, date: `29/${(currentMonthIndex + 1).toString().padStart(2, '0')}/2025`, checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Attendance</h1>
-        <p className="text-slate-500 text-sm mt-1">Track your daily attendance and working hours.</p>
-      </div>
+    <div className="p-2 min-h-[80vh] max-w-5xl mx-auto">
+      <div className="border border-slate-300 rounded-sm bg-white shadow-sm flex flex-col">
+        
+        {/* Header row */}
+        <div className="flex items-center border-b border-slate-300 p-3">
+          <h2 className="text-lg font-medium text-slate-800 px-2">Attendance</h2>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle>Today's Status</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center py-8">
-            <div className={`w-32 h-32 rounded-full border-8 flex flex-col items-center justify-center mb-6 ${isCheckedIn ? 'border-green-100' : 'border-slate-100'}`}>
-              <span className="text-3xl font-bold text-slate-800">
-                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-              <span className="text-sm text-slate-500">
-                {new Date().toLocaleDateString([], { month: 'short', day: 'numeric' })}
-              </span>
-            </div>
-
-            <div className="w-full space-y-4">
-              <Button 
-                variant={isCheckedIn ? 'danger' : 'primary'} 
-                className="w-full text-lg py-3"
-                onClick={handleCheckInOut}
-                isLoading={isChecking}
-              >
-                {isCheckedIn ? 'Check Out' : 'Check In'}
-              </Button>
-
-              <div className="flex items-center justify-center text-sm text-slate-500 gap-2">
-                <MapPin className="w-4 h-4" />
-                <span>Office Location</span>
+        {/* Filters row */}
+        <div className="flex items-center gap-4 p-3 border-b border-slate-300 px-5 flex-wrap">
+          <div className="flex">
+            <button 
+              onClick={handlePrevMonth}
+              className="border border-slate-300 p-1.5 hover:bg-slate-100 transition-colors text-slate-700"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button 
+              onClick={handleNextMonth}
+              className="border-t border-b border-r border-slate-300 p-1.5 hover:bg-slate-100 transition-colors text-slate-700"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+          
+          <div className="relative" ref={dropdownRef}>
+            <button 
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="border border-slate-300 px-4 py-1.5 flex items-center justify-between gap-2 hover:bg-slate-100 transition-colors text-sm text-slate-700 font-medium w-20"
+            >
+              {months[currentMonthIndex]} <ChevronDown size={16} />
+            </button>
+            
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 w-32 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-10 max-h-60 overflow-y-auto">
+                {months.map((month, idx) => (
+                  <button
+                    key={month}
+                    onClick={() => {
+                      setCurrentMonthIndex(idx);
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 ${currentMonthIndex === idx ? 'text-[#df80ff] font-medium bg-purple-50' : 'text-slate-700'}`}
+                  >
+                    {month}
+                  </button>
+                ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+          
+          <button 
+            onClick={() => setActiveSection(activeSection === 'present' ? '' : 'present')}
+            className={`border border-slate-300 px-4 py-1.5 transition-colors text-sm font-medium ${
+              activeSection === 'present' ? 'bg-[#df80ff] text-white border-[#df80ff]' : 'hover:bg-slate-100 text-slate-700'
+            }`}
+          >
+            Count of days present
+          </button>
+          
+          <button 
+            onClick={() => setActiveSection(activeSection === 'leaves' ? '' : 'leaves')}
+            className={`border border-slate-300 px-4 py-1.5 transition-colors text-sm font-medium ${
+              activeSection === 'leaves' ? 'bg-[#df80ff] text-white border-[#df80ff]' : 'hover:bg-slate-100 text-slate-700'
+            }`}
+          >
+            Leaves count
+          </button>
+          
+          <button 
+            onClick={() => setActiveSection(activeSection === 'total' ? '' : 'total')}
+            className={`border border-slate-300 px-4 py-1.5 transition-colors text-sm font-medium ${
+              activeSection === 'total' ? 'bg-[#df80ff] text-white border-[#df80ff]' : 'hover:bg-slate-100 text-slate-700'
+            }`}
+          >
+            Total working days
+          </button>
+        </div>
 
-        <Card className="md:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Attendance History</CardTitle>
-            <div className="flex gap-2">
-              <select className="text-sm border border-slate-300 rounded-md px-2 py-1">
-                <option>This Month</option>
-                <option>Last Month</option>
-              </select>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <DataTable 
-              columns={columns}
-              data={attendanceHistory}
-              searchable={false}
-            />
-          </CardContent>
-        </Card>
+        {/* Dynamic Section Display */}
+        {activeSection && (
+          <div className="bg-purple-50 border-b border-slate-300 p-4 text-center text-sm font-medium text-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
+            {activeSection === 'present' && `You have been present for 20 days in ${fullMonths[currentMonthIndex]} 2025.`}
+            {activeSection === 'leaves' && `You have taken 2 leaves in ${fullMonths[currentMonthIndex]} 2025.`}
+            {activeSection === 'total' && `There are a total of 22 working days in ${fullMonths[currentMonthIndex]} 2025.`}
+          </div>
+        )}
+
+        {/* Table Area */}
+        <div className="flex-1 overflow-x-auto">
+          <table className="w-full text-sm text-left border-collapse border-b border-slate-300">
+            <thead>
+              <tr className="border-b border-slate-300 bg-slate-50">
+                <th className="p-4 border-r border-slate-300 w-[20%]"></th>
+                <th colSpan="4" className="p-4 font-medium text-slate-800 tracking-wide text-sm bg-white">
+                  22,{fullMonths[currentMonthIndex]} 2025
+                </th>
+              </tr>
+              <tr className="border-b border-slate-300">
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Date</th>
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Check In</th>
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Check Out</th>
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Work Hours</th>
+                <th className="font-medium p-4 w-[20%] text-slate-800">Extra hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendanceData.map((row) => (
+                <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50 transition-colors">
+                  <td className="p-4 border-r border-slate-300 text-slate-600 font-medium">{row.date}</td>
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.checkIn}</td>
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.checkOut}</td>
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.workHours}</td>
+                  <td className="p-4 text-slate-600">{row.extraHours}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
   );

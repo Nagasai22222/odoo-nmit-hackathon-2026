@@ -13,6 +13,10 @@ import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 
+// Common Pages
+import Directory from '../pages/common/Directory';
+import Notifications from '../pages/Notifications';
+
 // Admin Pages
 import AdminDashboard from '../pages/admin/Dashboard';
 import EmployeesList from '../pages/admin/EmployeesList';
@@ -22,14 +26,10 @@ import AdminPayroll from '../pages/admin/Payroll';
 import AdminReports from '../pages/admin/Reports';
 
 // Employee Pages
-import EmployeeDashboard from '../pages/employee/Dashboard';
 import EmployeeProfile from '../pages/employee/Profile';
 import EmployeeAttendance from '../pages/employee/Attendance';
 import EmployeeLeave from '../pages/employee/Leave';
 import EmployeePayroll from '../pages/employee/Payroll';
-
-// Common Pages
-import Notifications from '../pages/Notifications';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -48,7 +48,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {
-    return <Navigate to={role === 'admin' ? '/admin/dashboard' : '/employee/dashboard'} replace />;
+    return <Navigate to={role === 'admin' ? '/admin/profile' : '/employee/profile'} replace />;
   }
 
   return children;
@@ -75,14 +75,20 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
+        <Route path="directory" element={<Directory />} />
+        <Route path="profile" element={<EmployeeProfile />} />
+        <Route path="profile/:id" element={<EmployeeProfile />} />
+        
+        {/* Legacy Admin Pages */}
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="employees" element={<EmployeesList />} />
+        
         <Route path="attendance" element={<AdminAttendance />} />
-        <Route path="leaves" element={<AdminLeaves />} />
+        <Route path="leave" element={<AdminLeaves />} />
         <Route path="payroll" element={<AdminPayroll />} />
         <Route path="reports" element={<AdminReports />} />
         <Route path="notifications" element={<Notifications />} />
-        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/admin/profile" replace />} />
       </Route>
 
       {/* Employee Routes */}
@@ -94,13 +100,15 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<EmployeeDashboard />} />
+        <Route path="directory" element={<Directory />} />
         <Route path="profile" element={<EmployeeProfile />} />
+        <Route path="profile/:id" element={<EmployeeProfile />} />
+        
         <Route path="attendance" element={<EmployeeAttendance />} />
         <Route path="leave" element={<EmployeeLeave />} />
         <Route path="payroll" element={<EmployeePayroll />} />
         <Route path="notifications" element={<Notifications />} />
-        <Route path="*" element={<Navigate to="/employee/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/employee/profile" replace />} />
       </Route>
 
       {/* Catch all */}

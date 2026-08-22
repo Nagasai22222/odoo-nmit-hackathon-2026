@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [loginType, setLoginType] = useState('employee');
   
   const { login } = useAuth();
   const { addToast } = useToast();
@@ -29,9 +30,9 @@ const Login = () => {
       addToast(`Welcome back, ${user.name}!`, 'success');
       
       if (user.role === 'admin') {
-        navigate('/admin/dashboard');
+        navigate('/admin/profile');
       } else {
-        navigate('/employee/dashboard');
+        navigate('/employee/profile');
       }
     } catch (err) {
       setError(err.message || 'Failed to login');
@@ -54,6 +55,41 @@ const Login = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6 px-4">
+        
+        {/* Login Type Tabs */}
+        <div className="flex border-b border-slate-300 mb-6">
+          <button
+            type="button"
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${
+              loginType === 'employee' 
+                ? 'text-[#df80ff] border-b-2 border-[#df80ff]' 
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+            onClick={() => {
+              setLoginType('employee');
+              setEmail('');
+              setPassword('');
+            }}
+          >
+            Employee Login
+          </button>
+          <button
+            type="button"
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${
+              loginType === 'admin' 
+                ? 'text-[#df80ff] border-b-2 border-[#df80ff]' 
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+            onClick={() => {
+              setLoginType('admin');
+              setEmail('admin@dayflow.com');
+              setPassword('Admin#2026'); // Autofill for convenience during demo
+            }}
+          >
+            Admin Login
+          </button>
+        </div>
+
         <div>
           <label className="block text-sm text-slate-700 mb-1">Login Id/Email :-</label>
           <input

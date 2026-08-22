@@ -1,149 +1,140 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import DataTable from '../../components/ui/DataTable';
-import StatusBadge from '../../components/ui/StatusBadge';
-import Button from '../../components/ui/Button';
-import Modal from '../../components/ui/Modal';
-import { useToast } from '../../context/ToastContext';
+import { Search, X, Check } from 'lucide-react';
 
 const AdminLeaves = () => {
-  const [selectedLeave, setSelectedLeave] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [comment, setComment] = useState('');
-  const [actionType, setActionType] = useState(''); // 'approve' or 'reject'
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { addToast } = useToast();
+  const [activeTab, setActiveTab] = useState('timeoff');
 
   const [leaveRequests, setLeaveRequests] = useState([
-    { id: 1, employeeId: 'EMP-001', name: 'John Doe', type: 'Paid Leave', startDate: '2023-11-15', endDate: '2023-11-17', days: 3, status: 'Pending', remarks: 'Family vacation' },
-    { id: 2, employeeId: 'EMP-003', name: 'Jane Smith', type: 'Sick Leave', startDate: '2023-11-01', endDate: '2023-11-02', days: 2, status: 'Approved', remarks: 'Medical appointment' },
-    { id: 3, employeeId: 'EMP-004', name: 'Michael Johnson', type: 'Unpaid Leave', startDate: '2023-10-25', endDate: '2023-10-26', days: 2, status: 'Rejected', remarks: 'Personal work' },
-    { id: 4, employeeId: 'EMP-005', name: 'Emily Davis', type: 'Paid Leave', startDate: '2023-12-20', endDate: '2023-12-31', days: 12, status: 'Pending', remarks: 'Annual vacation' },
+    { id: 1, name: 'John Doe', startDate: '28/10/2025', endDate: '28/10/2025', type: 'Paid time Off', status: '' },
+    { id: 2, name: 'Jane Smith', startDate: '28/10/2025', endDate: '28/10/2025', type: 'Paid time Off', status: '' },
+    { id: 3, name: 'Michael Johnson', startDate: '28/10/2025', endDate: '28/10/2025', type: 'Sick time off', status: '' },
+    { id: 4, name: 'Emily Davis', startDate: '28/10/2025', endDate: '28/10/2025', type: 'Paid time Off', status: '' },
+    { id: 5, name: 'Robert Wilson', startDate: '28/10/2025', endDate: '28/10/2025', type: 'Sick time off', status: '' },
   ]);
 
-  const openActionModal = (leave, action) => {
-    setSelectedLeave(leave);
-    setActionType(action);
-    setComment('');
-    setIsModalOpen(true);
+  const handleStatusUpdate = (id, newStatus) => {
+    setLeaveRequests(leaveRequests.map(req => 
+      req.id === id ? { ...req, status: newStatus } : req
+    ));
   };
-
-  const handleActionSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    setTimeout(() => {
-      setLeaveRequests(prev => prev.map(req => 
-        req.id === selectedLeave.id 
-          ? { ...req, status: actionType === 'approve' ? 'Approved' : 'Rejected' }
-          : req
-      ));
-      setIsSubmitting(false);
-      setIsModalOpen(false);
-      addToast(`Leave request ${actionType === 'approve' ? 'approved' : 'rejected'} successfully!`, 'success');
-    }, 800);
-  };
-
-  const columns = [
-    { header: 'Employee', key: 'name', sortable: true, render: (row) => (
-      <div className="flex flex-col">
-        <span className="font-medium text-slate-800">{row.name}</span>
-        <span className="text-xs text-slate-500">{row.employeeId}</span>
-      </div>
-    )},
-    { header: 'Leave Type', key: 'type', sortable: true },
-    { 
-      header: 'Duration', 
-      key: 'duration',
-      render: (row) => (
-        <span className="text-sm">
-          {new Date(row.startDate).toLocaleDateString()} to {new Date(row.endDate).toLocaleDateString()}
-        </span>
-      )
-    },
-    { header: 'Days', key: 'days', sortable: true },
-    { header: 'Remarks', key: 'remarks' },
-    { header: 'Status', key: 'status', sortable: true, render: (row) => <StatusBadge status={row.status} /> },
-    {
-      header: 'Actions',
-      key: 'actions',
-      render: (row) => (
-        row.status === 'Pending' ? (
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => openActionModal(row, 'approve')}>
-              Approve
-            </Button>
-            <Button variant="secondary" size="sm" className="text-red-600 border-red-200 hover:bg-red-50" onClick={() => openActionModal(row, 'reject')}>
-              Reject
-            </Button>
-          </div>
-        ) : (
-          <span className="text-sm text-slate-400">Action taken</span>
-        )
-      )
-    }
-  ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Leave Requests</h1>
-        <p className="text-slate-500 text-sm mt-1">Review and manage employee leave applications.</p>
+    <div className="p-2 min-h-[80vh] max-w-6xl mx-auto">
+      <div className="border border-slate-300 rounded-sm bg-white shadow-sm flex flex-col">
+        
+        {/* Top Tabs */}
+        <div className="flex border-b border-slate-300">
+          <button 
+            onClick={() => setActiveTab('timeoff')}
+            className={`px-8 py-3 font-medium text-sm transition-colors ${
+              activeTab === 'timeoff' 
+                ? 'bg-slate-100 text-slate-800 border-r border-slate-300' 
+                : 'text-slate-600 hover:bg-slate-50 border-r border-slate-300'
+            }`}
+          >
+            Time Off
+          </button>
+          <button 
+            onClick={() => setActiveTab('allocation')}
+            className={`px-8 py-3 font-medium text-sm transition-colors ${
+              activeTab === 'allocation' 
+                ? 'bg-slate-100 text-slate-800 border-r border-slate-300' 
+                : 'text-slate-600 hover:bg-slate-50 border-r border-slate-300'
+            }`}
+          >
+            Allocation
+          </button>
+          <div className="flex-1"></div>
+        </div>
+
+        {/* Action Row */}
+        <div className="flex items-center gap-4 p-3 border-b border-slate-300">
+          <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-1.5 text-sm font-medium rounded-sm uppercase tracking-wide">
+            NEW
+          </button>
+          <div className="relative border border-slate-300 rounded-sm overflow-hidden flex items-center px-3 py-1.5 bg-slate-50 flex-1 max-w-md ml-12">
+            <Search size={16} className="text-slate-400 mr-2" />
+            <input 
+              type="text" 
+              placeholder="Searchbar" 
+              className="bg-transparent border-none text-sm outline-none w-full text-slate-700 italic"
+            />
+          </div>
+        </div>
+
+        {/* Stats Row */}
+        <div className="flex border-b border-slate-300">
+          <div className="flex-1 p-4 border-r border-slate-300 flex flex-col items-center justify-center">
+            <h3 className="text-blue-500 font-medium mb-1">Paid time Off</h3>
+            <p className="text-sm text-slate-700 font-medium">24 Days Available</p>
+          </div>
+          <div className="flex-1 p-4 border-r border-slate-300 flex flex-col items-center justify-center">
+            <h3 className="text-blue-500 font-medium mb-1">Sick time off</h3>
+            <p className="text-sm text-slate-700 font-medium">07 Days Available</p>
+          </div>
+          <div className="w-[30%]"></div> {/* Empty space to match grid */}
+        </div>
+
+        {/* Table Area */}
+        <div className="flex-1 overflow-y-scroll max-h-[500px]">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead className="sticky top-0 bg-white">
+              <tr className="border-b border-slate-300 bg-slate-50">
+                <th className="font-medium p-3 border-r border-slate-300 text-slate-800">Name</th>
+                <th className="font-medium p-3 border-r border-slate-300 text-slate-800">Start Date</th>
+                <th className="font-medium p-3 border-r border-slate-300 text-slate-800">End Date</th>
+                <th className="font-medium p-3 border-r border-slate-300 text-slate-800">Time off Type</th>
+                <th className="font-medium p-3 border-r border-slate-300 text-slate-800">Status</th>
+                <th className="font-medium p-3 text-slate-800 w-24"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaveRequests.map((row) => (
+                <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50 transition-colors h-12">
+                  <td className="p-3 border-r border-slate-300 text-slate-700">{row.name}</td>
+                  <td className="p-3 border-r border-slate-300 text-slate-700">{row.startDate}</td>
+                  <td className="p-3 border-r border-slate-300 text-slate-700">{row.endDate}</td>
+                  <td className="p-3 border-r border-slate-300 text-blue-500 font-medium">{row.type}</td>
+                  <td className="p-3 border-r border-slate-300">
+                    {row.status === 'Approved' && <span className="text-green-600 font-medium">Approved</span>}
+                    {row.status === 'Rejected' && <span className="text-red-500 font-medium">Rejected</span>}
+                    {row.status === '' && <span className="text-slate-500 italic">Pending</span>}
+                  </td>
+                  <td className="p-3 flex items-center gap-2 justify-center h-full">
+                    {row.status === '' && (
+                      <>
+                        <button 
+                          onClick={() => handleStatusUpdate(row.id, 'Rejected')}
+                          className="w-6 h-4 bg-red-400 hover:bg-red-500 rounded-sm flex items-center justify-center group transition-colors" 
+                          title="Reject"
+                        >
+                          <X size={12} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                        <button 
+                          onClick={() => handleStatusUpdate(row.id, 'Approved')}
+                          className="w-6 h-4 bg-green-500 hover:bg-green-600 rounded-sm flex items-center justify-center group transition-colors" 
+                          title="Approve"
+                        >
+                          <Check size={12} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              <tr className="h-64">
+                <td className="border-r border-slate-300"></td>
+                <td className="border-r border-slate-300"></td>
+                <td className="border-r border-slate-300"></td>
+                <td className="border-r border-slate-300"></td>
+                <td className="border-r border-slate-300"></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
-
-      <Card>
-        <CardContent className="p-0">
-          <DataTable 
-            columns={columns}
-            data={leaveRequests}
-            searchPlaceholder="Search by employee name..."
-            searchField={(item) => item.name}
-          />
-        </CardContent>
-      </Card>
-
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title={actionType === 'approve' ? 'Approve Leave Request' : 'Reject Leave Request'}
-      >
-        {selectedLeave && (
-          <form onSubmit={handleActionSubmit} className="space-y-4">
-            <div className="bg-slate-50 p-4 rounded-lg text-sm mb-4">
-              <p><strong>Employee:</strong> {selectedLeave.name} ({selectedLeave.employeeId})</p>
-              <p><strong>Leave Type:</strong> {selectedLeave.type}</p>
-              <p><strong>Duration:</strong> {selectedLeave.startDate} to {selectedLeave.endDate} ({selectedLeave.days} days)</p>
-              <p><strong>Reason:</strong> {selectedLeave.remarks}</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Add a comment {actionType === 'reject' && <span className="text-red-500">*</span>}
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px]"
-                placeholder={`Provide a reason for ${actionType === 'approve' ? 'approval (optional)' : 'rejection'}...`}
-                required={actionType === 'reject'}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              ></textarea>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-              <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                variant={actionType === 'approve' ? 'primary' : 'danger'} 
-                type="submit" 
-                isLoading={isSubmitting}
-              >
-                Confirm {actionType === 'approve' ? 'Approval' : 'Rejection'}
-              </Button>
-            </div>
-          </form>
-        )}
-      </Modal>
     </div>
   );
 };

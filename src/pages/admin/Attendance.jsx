@@ -1,97 +1,89 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import DataTable from '../../components/ui/DataTable';
-import StatusBadge from '../../components/ui/StatusBadge';
-import Button from '../../components/ui/Button';
-import { Download } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 const AdminAttendance = () => {
   const attendanceData = [
-    { id: 1, employeeId: 'EMP-001', name: 'John Doe', date: '2023-10-31', checkIn: '09:00 AM', checkOut: '05:30 PM', workingHours: '8h 30m', status: 'Present' },
-    { id: 2, employeeId: 'EMP-002', name: 'Jane Smith', date: '2023-10-31', checkIn: '09:15 AM', checkOut: '05:45 PM', workingHours: '8h 30m', status: 'Present' },
-    { id: 3, employeeId: 'EMP-003', name: 'Michael Johnson', date: '2023-10-31', checkIn: '09:00 AM', checkOut: '01:00 PM', workingHours: '4h 00m', status: 'Half-day' },
-    { id: 4, employeeId: 'EMP-004', name: 'Emily Davis', date: '2023-10-31', checkIn: '-', checkOut: '-', workingHours: '-', status: 'Leave' },
-    { id: 5, employeeId: 'EMP-005', name: 'Robert Wilson', date: '2023-10-31', checkIn: '-', checkOut: '-', workingHours: '-', status: 'Absent' },
-  ];
-
-  const columns = [
-    { header: 'Employee', key: 'name', sortable: true, render: (row) => (
-      <div className="flex flex-col">
-        <span className="font-medium text-slate-800">{row.name}</span>
-        <span className="text-xs text-slate-500">{row.employeeId}</span>
-      </div>
-    )},
-    { header: 'Date', key: 'date', sortable: true, render: (row) => new Date(row.date).toLocaleDateString() },
-    { header: 'Check In', key: 'checkIn' },
-    { header: 'Check Out', key: 'checkOut' },
-    { header: 'Working Hours', key: 'workingHours' },
-    { header: 'Status', key: 'status', render: (row) => <StatusBadge status={row.status} /> }
+    { id: 1, name: 'John Doe', checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
+    { id: 2, name: 'Jane Smith', checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
+    { id: 3, name: 'Michael Johnson', checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
+    { id: 4, name: 'Emily Davis', checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
+    { id: 5, name: 'Robert Wilson', checkIn: '10:00', checkOut: '19:00', workHours: '09:00', extraHours: '01:00' },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Attendance Log</h1>
-          <p className="text-slate-500 text-sm mt-1">Monitor employee attendance records across the organization.</p>
+    <div className="flex flex-col p-2 min-h-[80vh] max-w-7xl mx-auto">
+      
+      {/* Main List View */}
+      <div className="flex-1 border border-slate-300 rounded-sm bg-white shadow-sm flex flex-col">
+        
+        {/* Header row */}
+        <div className="flex items-center border-b border-slate-300 p-3">
+          <h2 className="text-lg font-medium w-48 text-slate-800 px-2">Attendance</h2>
+          <div className="flex-1 max-w-md">
+            <div className="relative border border-slate-300 rounded-sm overflow-hidden flex items-center px-3 py-1.5 bg-slate-50">
+              <Search size={16} className="text-slate-400 mr-2" />
+              <input 
+                type="text" 
+                placeholder="Searchbar" 
+                className="bg-transparent border-none text-sm outline-none w-full text-slate-700 italic"
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <input type="date" className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500" defaultValue="2023-10-31" />
-          <Button variant="secondary" className="gap-2">
-            <Download size={18} /> Export
-          </Button>
+
+        {/* Filters row */}
+        <div className="flex items-center gap-4 p-3 border-b border-slate-300 px-5">
+          <div className="flex">
+            <button className="border border-slate-300 p-1.5 hover:bg-slate-100 transition-colors text-slate-700">
+              <ChevronLeft size={18} />
+            </button>
+            <button className="border-t border-b border-r border-slate-300 p-1.5 hover:bg-slate-100 transition-colors text-slate-700">
+              <ChevronRight size={18} />
+            </button>
+          </div>
+          
+          <button className="border border-slate-300 px-4 py-1.5 flex items-center gap-2 hover:bg-slate-100 transition-colors text-sm text-slate-700 font-medium">
+            Date <ChevronDown size={16} />
+          </button>
+          
+          <button className="border border-slate-300 px-6 py-1.5 hover:bg-slate-100 transition-colors text-sm text-slate-700 font-medium">
+            Day
+          </button>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Total Present</p>
-              <p className="text-2xl font-bold text-slate-800">142</p>
-            </div>
-            <div className="w-2 h-10 rounded-full bg-green-500"></div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Total Absent</p>
-              <p className="text-2xl font-bold text-slate-800">3</p>
-            </div>
-            <div className="w-2 h-10 rounded-full bg-red-500"></div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">Half Day</p>
-              <p className="text-2xl font-bold text-slate-800">2</p>
-            </div>
-            <div className="w-2 h-10 rounded-full bg-yellow-500"></div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">On Leave</p>
-              <p className="text-2xl font-bold text-slate-800">3</p>
-            </div>
-            <div className="w-2 h-10 rounded-full bg-purple-500"></div>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Table Area */}
+        <div className="flex-1 overflow-x-auto">
+          <table className="w-full text-sm text-left border-collapse border-b border-slate-300">
+            <thead>
+              <tr className="border-b border-slate-300">
+                <th className="p-4 border-r border-slate-300 w-[20%]"></th>
+                <th colSpan="4" className="p-4 font-medium text-slate-800 tracking-wide text-sm">
+                  22,October 2025
+                </th>
+              </tr>
+              <tr className="border-b border-slate-300">
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Emp</th>
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Check In</th>
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Check Out</th>
+                <th className="font-medium p-4 border-r border-slate-300 w-[20%] text-slate-800">Work Hours</th>
+                <th className="font-medium p-4 w-[20%] text-slate-800">Extra hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendanceData.map((row) => (
+                <tr key={row.id} className="border-b border-slate-300 hover:bg-slate-50 transition-colors">
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.name}</td>
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.checkIn}</td>
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.checkOut}</td>
+                  <td className="p-4 border-r border-slate-300 text-slate-600">{row.workHours}</td>
+                  <td className="p-4 text-slate-600">{row.extraHours}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <DataTable 
-            columns={columns}
-            data={attendanceData}
-            searchPlaceholder="Search by employee name or ID..."
-            searchField={(item) => `${item.name} ${item.employeeId}`}
-          />
-        </CardContent>
-      </Card>
+      </div>
     </div>
   );
 };

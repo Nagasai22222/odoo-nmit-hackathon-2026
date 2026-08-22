@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('dayflow_user', JSON.stringify(foundUser));
           resolve(foundUser);
         }
-        else if (email === 'admin@dayflow.com') {
+        else if (email === 'admin@dayflow.com' && password === 'Admin#2026') {
           const adminUser = { id: 1, name: 'Admin User', email, role: 'admin', employeeId: 'EMP-001' };
           setUser(adminUser);
           setRole('admin');
