@@ -34,7 +34,15 @@ model Profile {
   address       String?
   designation   String?
   department    String?
+  jobPosition   String?
+  manager       String?
+  company       String?   @default("Dayflow HRMS")
+  location      String?
   dateOfJoining DateTime?
+  dateOfBirth   DateTime?
+  gender        String?
+  nationality   String?
+  maritalStatus String?
   avatarUrl     String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

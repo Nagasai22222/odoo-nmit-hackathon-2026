@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
 
 export default async function AdminDashboardPage() {
@@ -38,6 +39,9 @@ export default async function AdminDashboardPage() {
           <span className="role-badge role-badge-hr">HR ADMIN DASHBOARD</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <Link href="/admin/employees" className="btn-secondary">
+            👥 Personnel Directory
+          </Link>
           <span style={{ fontSize: "0.9rem", color: "var(--text-secondary)" }}>
             HR ID: <strong style={{ color: "var(--text-primary)" }}>{adminUser.employeeId}</strong>
           </span>
