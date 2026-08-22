@@ -64,9 +64,9 @@ const Register = () => {
     setIsSubmitting(true);
     
     try {
-      const user = await register(formData);
-      addToast('Registration successful!', 'success');
-      navigate('/employee/dashboard');
+      await register(formData);
+      addToast('Registration successful! Please sign in.', 'success');
+      navigate('/login');
     } catch (err) {
       setErrors({ form: err.message || 'Registration failed' });
       addToast('Registration failed. Please try again.', 'error');

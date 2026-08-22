@@ -28,7 +28,18 @@ export const AuthProvider = ({ children }) => {
     // Mock login logic
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (email === 'admin@dayflow.com') {
+        // First check dynamically registered users
+        const registeredUsers = JSON.parse(localStorage.getItem('dayflow_registered_users') || '[]');
+        const foundUser = registeredUsers.find(u => u.email === email && u.password === password);
+        
+        if (foundUser) {
+          setUser(foundUser);
+          setRole(foundUser.role || 'employee');
+          setIsAuthenticated(true);
+          localStorage.setItem('dayflow_user', JSON.stringify(foundUser));
+          resolve(foundUser);
+        }
+        else if (email === 'admin@dayflow.com') {
           const adminUser = { id: 1, name: 'Admin User', email, role: 'admin', employeeId: 'EMP-001' };
           setUser(adminUser);
           setRole('admin');
@@ -43,7 +54,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('dayflow_user', JSON.stringify(empUser));
           resolve(empUser);
         } else {
-          reject(new Error('Invalid credentials. Use admin@dayflow.com or employee@dayflow.com'));
+          reject(new Error('Invalid credentials. Check your email and password.'));
         }
       }, 1000);
     });
@@ -54,10 +65,14 @@ export const AuthProvider = ({ children }) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const newUser = { ...userData, id: Date.now() };
-        setUser(newUser);
-        setRole(newUser.role);
-        setIsAuthenticated(true);
-        localStorage.setItem('dayflow_user', JSON.stringify(newUser));
+        
+        // Save to a registered list in local storage so they can actually log in later
+        const existingUsers = JSON.parse(localStorage.getItem('dayflow_registered_users') || '[]');
+        existingUsers.push(newUser);
+        localStorage.setItem('dayflow_registered_users', JSON.stringify(existingUsers));
+        
+        // We DO NOT set isAuthenticated here. We just resolve, 
+        // which simulates successful backend registration.
         resolve(newUser);
       }, 1000);
     });
