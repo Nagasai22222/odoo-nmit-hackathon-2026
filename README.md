@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dayflow HRMS - Human Resource Management System 🚀
 
-## Getting Started
+**Dayflow** is a modern, responsive, and robust Human Resource Management System built for the Odoo NMIT Hackathon 2026. Designed with a clean "glassmorphism" aesthetic, Dayflow simplifies employee management, attendance tracking, and payroll processing.
 
-First, run the development server:
+## 🌟 Key Features
 
+*   **Role-Based Access Control (RBAC):** Distinct dashboards and permissions for `ADMIN` (HR Officers) and `EMPLOYEE` users.
+*   **Secure Authentication:** Powered by JWT and bcrypt for secure login and sessions.
+*   **Employee Directory:** A clean grid-view directory of all employees with live presence indicators (Present, Absent, Leave).
+*   **Time & Attendance:** Interactive check-in/check-out functionality with monthly summary views.
+*   **Leave Management:** Comprehensive 12-month calendar interface for submitting and tracking time-off requests.
+*   **Payroll Control (Admin):** Dedicated data tables for HR to manage and update salary structures.
+*   **Analytics Dashboard (Admin):** High-level KPI metrics and visual charts summarizing company-wide HR health.
+
+## 🛠️ Technology Stack
+
+*   **Frontend:** [Next.js 14](https://nextjs.org/) (React), Tailwind CSS, Lucide Icons
+*   **Backend:** Next.js Server Actions & API Routes
+*   **Database:** **MySQL**
+*   **ORM:** [Prisma](https://www.prisma.io/)
+*   **Authentication:** Custom JWT-based stateless authentication
+
+---
+
+## 🚀 Getting Started (Local Development)
+
+### 1. Prerequisites
+*   Node.js (v18+)
+*   MySQL Server installed and running locally
+
+### 2. Installation
+Clone the repository and install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Nagasai22222/odoo-nmit-hackathon-2026.git
+cd hrms
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Database Configuration
+Create a `.env` file in the root directory and add your MySQL connection string. Note: Ensure you have an empty database named `dayflow` created in your MySQL server.
+```env
+DATABASE_URL="mysql://root:YOUR_PASSWORD@localhost:3306/dayflow"
+JWT_SECRET="your-super-secret-jwt-key"
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Push Schema & Seed Database
+Sync the Prisma schema with your MySQL database and populate it with initial data (this will create your test users):
+```bash
+npx prisma db push
+npx ts-node prisma/seed.ts
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 5. Run the Application
+Start the Next.js development server:
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🔐 How to Log In & Test
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application has two primary testing accounts pre-configured in the database:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Admin / HR Manager Access:**
+*   **Email:** `newadmin@dayflow.com`
+*   **Password:** `admin123`
+*   *Access Level:* Full access to Employee Directory, Attendance overrides, Payroll, and Analytics Reports.
 
-## Deploy on Vercel
+**Standard Employee Access:**
+*   **Login ID:** `EMP-001`
+*   **Password:** `password`
+*   *Access Level:* Restricted to viewing their own personal profile, marking daily attendance, and submitting leave requests.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+*(Tip: On the `/login` page, you can use the "Admin Login" and "Employee Login" quick-tabs at the top of the form to auto-fill these credentials for faster testing!)*
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 👨‍💻 New Registrations
+If an employee or HR officer uses the **Sign Up** page, their account is securely hashed and immediately written to the MySQL `User` and `Employee` tables. They can log in immediately after registration.
